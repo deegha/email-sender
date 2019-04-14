@@ -40,11 +40,12 @@ This application sends emails to a given user or set of users. I have used a sen
 #### sending emails
 - call `/v1/emails` with a payload as following 
 > Change the email address to your email address
+
 `{
   "to": "somone@gmail.com",
   "subject": "Tesging the apo",
   "content": "We are testing the webhook"
-}`
+ }`
 
 - Once you call the endpoint,
 - You should see ACCEPTED status in the response
