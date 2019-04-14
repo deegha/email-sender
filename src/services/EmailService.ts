@@ -1,7 +1,8 @@
 import sgMail from "@sendgrid/mail"
 import Email from "../models/emailModel"
 import moment from "moment"
-import { getEmailStatus, STATUS_QUEUED, STATUS_SENT, SENDER_EMAIL } from "../utils"
+import { getEmailStatusString, getEmailStatus} from "../utils"
+import { SENDER_EMAIL, STATUS_QUEUED, STATUS_ACCEPTED } from '../config/config'
 import { EmailDtoInterface } from "../intrerfaces/EmailInterface"
 
 class EmailService {
@@ -10,25 +11,31 @@ class EmailService {
     try {
       const shouldQued = this.shouldQued()
       let emailStatus: number
-      if (!shouldQued) {
-        const response: any = await this.emailService({
-          to: dtoObject.to,
-          from: SENDER_EMAIL,
-          subject: dtoObject.subject,
-          text: dtoObject.content
-        })
-        emailStatus = response[0].statusCode
-      } else {
-        emailStatus = STATUS_QUEUED
-      }
 
       const databaseResponse = await this.saveEmailDetails({
         to: dtoObject.to,
         from: SENDER_EMAIL,
         subject: dtoObject.subject,
         text: dtoObject.content,
-        status: emailStatus
+        status: STATUS_ACCEPTED,
       })
+
+      if (!shouldQued) {
+      const emailObject= {
+        to: dtoObject.to,
+        from: SENDER_EMAIL,
+        subject: dtoObject.subject,
+        text: dtoObject.content,
+        custom_args: {
+          diffId: databaseResponse._id 
+        }
+      }
+      await this.emailService(emailObject)
+
+      }else {
+        emailStatus= STATUS_QUEUED
+        this.updateEmail(databaseResponse._id, {status: STATUS_QUEUED})
+      }
 
       return {
         id: databaseResponse._id,
@@ -42,7 +49,7 @@ class EmailService {
   checkEmailStatus = async (id: any) => {
     try {
       const email = await Email.findById(id)
-      const status = getEmailStatus(email.status)
+      const status = getEmailStatus(parseInt(email.status))
       return status
     } catch (err) {
       throw new Error(`error in finding the record ${err}`)
@@ -51,10 +58,29 @@ class EmailService {
 
   sendAllQueuedEmails = async () => {
     const queuedEmails = await Email.find().where("status").equals(STATUS_QUEUED)
-    this.emailService(queuedEmails)
+    const mailList = queuedEmails.map(mail => ({
+      to: mail.to,
+      from: mail.from,
+      subject: mail.subject,
+      text: mail.text,
+      custom_args: {
+        diffId: mail._id ,
+
+      }
+    }))
+    console.log(mailList, "mailList")
+    this.emailService(mailList)
   }
 
-  private updateEmailStatus = async (id: any, payload: any) => {
+  updateEmailStatus = async (list:any) => {
+    list.map(async (event:any) => {
+      this.updateEmail(event.diffId, {
+        status: getEmailStatusString(event.event)
+      })
+    })
+  }
+
+  private updateEmail= async (id: any, payload: any) => {
     try {
       const response = await Email.findByIdAndUpdate(id, payload)
       console.log(response)
@@ -69,7 +95,7 @@ class EmailService {
     const timenow =  moment().format(format)
     const time = moment(timenow, format)
     const beforeTime =  moment("08:00:00", format)
-    const afterTime = moment("24:00:00", format)
+    const afterTime = moment("12:00:00", format)
     const value = time.isBetween(beforeTime, afterTime)
     return !value
   }
@@ -80,6 +106,7 @@ class EmailService {
 
       return await sgMail.send(msg)
     } catch (err) {
+      console.log(err)
       throw new Error(`error in sending email ${err}`)
     }
   }

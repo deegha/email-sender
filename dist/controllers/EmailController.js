@@ -8,40 +8,50 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const MainController_1 = require("./MainController");
 const EmailService_1 = require("../services/EmailService");
-class EmailController {
+class EmailController extends MainController_1.MainController {
     constructor() {
+        super(...arguments);
         this.sendEmail = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            try {
-                const body = req.body;
-                const response = yield EmailService_1.emailService.sendEmail(body);
-                const responseObj = response;
-                res.send(responseObj);
+            const { body } = req;
+            if (!body.to || !body.content || !body.subject) {
+                this.sendBadRequest(res);
             }
-            catch (err) {
-                res.status(500).send({
-                    message: "somthing went wrong"
-                });
+            else {
+                try {
+                    const response = yield EmailService_1.emailService.sendEmail(body);
+                    res.send(response);
+                }
+                catch (err) {
+                    this.sendServerError(res);
+                }
             }
         });
         this.checkEmailStatus = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
-            try {
-                const status = yield EmailService_1.emailService.checkEmailStatus(id);
-                res.send({
-                    id,
-                    status
-                });
+            if (!id || id === null) {
+                this.sendBadRequest(res);
             }
-            catch (err) {
-                res.status(500).send({
-                    message: "somthing went wrong"
-                });
+            else {
+                try {
+                    const status = yield EmailService_1.emailService.checkEmailStatus(id);
+                    res.send({ id, status });
+                }
+                catch (err) {
+                    this.sendServerError(res);
+                }
             }
         });
         this.handleWebHook = (req, res) => __awaiter(this, void 0, void 0, function* () {
             console.log(req.body);
-            res.send({ message: "success" });
+            try {
+                yield EmailService_1.emailService.updateEmailStatus(req.body);
+                res.send({ message: "success" });
+            }
+            catch (err) {
+                this.sendServerError(res);
+            }
         });
     }
 }

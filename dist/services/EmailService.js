@@ -15,31 +15,36 @@ const mail_1 = __importDefault(require("@sendgrid/mail"));
 const emailModel_1 = __importDefault(require("../models/emailModel"));
 const moment_1 = __importDefault(require("moment"));
 const utils_1 = require("../utils");
+const config_1 = require("../config/config");
 class EmailService {
     constructor() {
         this.sendEmail = (dtoObject) => __awaiter(this, void 0, void 0, function* () {
             try {
                 const shouldQued = this.shouldQued();
                 let emailStatus;
-                if (!shouldQued) {
-                    const response = yield this.emailService({
-                        to: dtoObject.to,
-                        from: utils_1.SENDER_EMAIL,
-                        subject: dtoObject.subject,
-                        text: dtoObject.content
-                    });
-                    emailStatus = response[0].statusCode;
-                }
-                else {
-                    emailStatus = utils_1.STATUS_QUEUED;
-                }
                 const databaseResponse = yield this.saveEmailDetails({
                     to: dtoObject.to,
-                    from: utils_1.SENDER_EMAIL,
+                    from: config_1.SENDER_EMAIL,
                     subject: dtoObject.subject,
                     text: dtoObject.content,
-                    status: emailStatus
+                    status: config_1.STATUS_ACCEPTED,
                 });
+                if (!shouldQued) {
+                    const emailObject = {
+                        to: dtoObject.to,
+                        from: config_1.SENDER_EMAIL,
+                        subject: dtoObject.subject,
+                        text: dtoObject.content,
+                        custom_args: {
+                            diffId: databaseResponse._id
+                        }
+                    };
+                    yield this.emailService(emailObject);
+                }
+                else {
+                    emailStatus = config_1.STATUS_QUEUED;
+                    this.updateEmail(databaseResponse._id, { status: config_1.STATUS_QUEUED });
+                }
                 return {
                     id: databaseResponse._id,
                     status: utils_1.getEmailStatus(emailStatus)
@@ -52,7 +57,7 @@ class EmailService {
         this.checkEmailStatus = (id) => __awaiter(this, void 0, void 0, function* () {
             try {
                 const email = yield emailModel_1.default.findById(id);
-                const status = utils_1.getEmailStatus(email.status);
+                const status = utils_1.getEmailStatus(parseInt(email.status));
                 return status;
             }
             catch (err) {
@@ -60,10 +65,27 @@ class EmailService {
             }
         });
         this.sendAllQueuedEmails = () => __awaiter(this, void 0, void 0, function* () {
-            const queuedEmails = yield emailModel_1.default.find().where("status").equals(utils_1.STATUS_QUEUED);
-            this.emailService(queuedEmails);
+            const queuedEmails = yield emailModel_1.default.find().where("status").equals(config_1.STATUS_QUEUED);
+            const mailList = queuedEmails.map(mail => ({
+                to: mail.to,
+                from: mail.from,
+                subject: mail.subject,
+                text: mail.text,
+                custom_args: {
+                    diffId: mail._id,
+                }
+            }));
+            console.log(mailList, "mailList");
+            this.emailService(mailList);
         });
-        this.updateEmailStatus = (id, payload) => __awaiter(this, void 0, void 0, function* () {
+        this.updateEmailStatus = (list) => __awaiter(this, void 0, void 0, function* () {
+            list.map((event) => __awaiter(this, void 0, void 0, function* () {
+                this.updateEmail(event.diffId, {
+                    status: utils_1.getEmailStatusString(event.event)
+                });
+            }));
+        });
+        this.updateEmail = (id, payload) => __awaiter(this, void 0, void 0, function* () {
             try {
                 const response = yield emailModel_1.default.findByIdAndUpdate(id, payload);
                 console.log(response);
@@ -78,7 +100,7 @@ class EmailService {
             const timenow = moment_1.default().format(format);
             const time = moment_1.default(timenow, format);
             const beforeTime = moment_1.default("08:00:00", format);
-            const afterTime = moment_1.default("24:00:00", format);
+            const afterTime = moment_1.default("12:00:00", format);
             const value = time.isBetween(beforeTime, afterTime);
             return !value;
         };
@@ -88,6 +110,7 @@ class EmailService {
                 return yield mail_1.default.send(msg);
             }
             catch (err) {
+                console.log(err);
                 throw new Error(`error in sending email ${err}`);
             }
         });

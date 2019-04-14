@@ -13,11 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const emailUtils_1 = require("./emailUtils");
+exports.getEmailStatusString = emailUtils_1.getEmailStatusString;
 exports.getEmailStatus = emailUtils_1.getEmailStatus;
 exports.setEmailScheduler = emailUtils_1.setEmailScheduler;
-exports.STATUS_QUEUED = emailUtils_1.STATUS_QUEUED;
-exports.STATUS_SENT = emailUtils_1.STATUS_SENT;
-exports.SENDER_EMAIL = emailUtils_1.SENDER_EMAIL;
 const applyMiddleware = (middleware, router) => {
     for (const f of middleware) {
         f(router);

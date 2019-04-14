@@ -1,43 +1,47 @@
 import { Request, Response } from "express"
+import { MainController } from './MainController'
 import { emailService } from "../services/EmailService"
 
-class EmailController {
-
+class EmailController extends MainController {
+  
   sendEmail = async (req: Request, res: Response) => {
-    try {
-      const body = req.body
-      const response = await emailService.sendEmail(body)
-      const responseObj = response
+    const { body } = req
 
-      res.send(responseObj)
-    } catch (err) {
-      res.status(500).send({
-        message: "somthing went wrong"
-      })
+    if(!body.to || !body.content || !body.subject) {
+      this.sendBadRequest(res)
+    }else {
+      try {
+        const response = await emailService.sendEmail(body)
+        res.send(response)
+      } catch (err) {
+        this.sendServerError(res)
+      }
     }
   }
 
   checkEmailStatus =  async (req: Request, res: Response) => {
     const { id }  = req.params
-
-    try {
-      const status = await emailService.checkEmailStatus(id)
-      res.send({
-        id,
-        status
-      })
-    } catch (err) {
-      res.status(500).send({
-        message: "somthing went wrong"
-      })
+    if(!id || id === null) {
+      this.sendBadRequest(res)
+    }else {
+      try {
+        const status = await emailService.checkEmailStatus(id)
+        res.send({id,status})
+      } catch (err) {
+        this.sendServerError(res)
+      }
     }
   }
 
   handleWebHook = async (req: Request, res: Response) => {
     console.log(req.body)
-    res.send({message: "success"})
+    try {
+      await emailService.updateEmailStatus(req.body)
+      res.send({message: "success"})
+    }catch(err) {
+      this.sendServerError(res)
+    }
   }
-
 }
 
 export const email = new EmailController()

@@ -17,7 +17,7 @@ connectDatabase()
 
 const server = http.createServer(router)
 
-setEmailScheduler("24 * * * *")
+setEmailScheduler("32 * * * *")
 
 server.listen( port, () => {
     console.log( `server started at http://localhost:${ port }` )

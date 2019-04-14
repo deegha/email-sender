@@ -1,7 +1,7 @@
 
 import { NextFunction, Request, Response, Router } from "express"
 import mongoose from "mongoose"
-import { getEmailStatus, setEmailScheduler, STATUS_QUEUED, STATUS_SENT, SENDER_EMAIL } from "./emailUtils"
+import { getEmailStatusString, getEmailStatus, setEmailScheduler} from "./emailUtils"
 
 type Wrapper = ((router: Router) => void)
 
@@ -52,7 +52,5 @@ export {
   getEmailStatus,
   setEmailScheduler,
   applyRoutes,
-  STATUS_QUEUED,
-  STATUS_SENT,
-  SENDER_EMAIL
+  getEmailStatusString
 }

@@ -16,7 +16,7 @@ utils_1.applyMiddleware(middleware_1.default, router);
 utils_1.applyRoutes(routes_1.default, router);
 utils_1.connectDatabase();
 const server = http_1.default.createServer(router);
-utils_1.setEmailScheduler("24 * * * *");
+utils_1.setEmailScheduler("32 * * * *");
 server.listen(port, () => {
     console.log(`server started at http://localhost:${port}`);
 });
