@@ -35,8 +35,8 @@ class EmailController extends MainController_1.MainController {
             }
             else {
                 try {
-                    const status = yield EmailService_1.emailService.checkEmailStatus(id);
-                    res.send({ id, status });
+                    const response = yield EmailService_1.emailService.checkEmailStatus(id);
+                    res.send(response);
                 }
                 catch (err) {
                     this.sendServerError(res);
@@ -46,11 +46,27 @@ class EmailController extends MainController_1.MainController {
         this.handleWebHook = (req, res) => __awaiter(this, void 0, void 0, function* () {
             console.log(req.body);
             try {
-                yield EmailService_1.emailService.updateEmailStatus(req.body);
+                EmailService_1.emailService.updateEmailStatus(req.body);
                 res.send({ message: "success" });
             }
             catch (err) {
                 this.sendServerError(res);
+            }
+        });
+        this.deleteEmail = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { id } = req.params;
+            if (!id || id === null) {
+                this.sendBadRequest(res);
+            }
+            else {
+                try {
+                    const response = yield EmailService_1.emailService.deleteEmailFromQueue(id);
+                    res.send(response);
+                }
+                catch (err) {
+                    console.log(err);
+                    this.sendServerError(res);
+                }
             }
         });
     }

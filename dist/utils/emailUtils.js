@@ -15,16 +15,16 @@ exports.getEmailStatus = (code) => {
         case config_1.STATUS_QUEUED:
             return "QUEUED";
         case config_1.STATUS_DROPED:
-            return 'FAILED';
+            return "FAILED";
     }
 };
 exports.getEmailStatusString = (code) => {
     switch (code) {
-        case 'processed':
+        case "processed":
             return config_1.STATUS_ACCEPTED;
-        case 'delivered':
+        case "delivered":
             return config_1.STATUS_SENT;
-        case 'dropped':
+        case "dropped":
             return config_1.STATUS_DROPED;
     }
 };

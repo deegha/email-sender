@@ -2,6 +2,7 @@ import dotenv from "dotenv"
 import express from "express"
 
 import http from "http"
+import { SHEDULE_TIMER } from "./config/config"
 import { applyMiddleware, applyRoutes, connectDatabase, setEmailScheduler } from "./utils"
 
 import middleware from "./middleware"
@@ -17,7 +18,7 @@ connectDatabase()
 
 const server = http.createServer(router)
 
-setEmailScheduler("32 * * * *")
+setEmailScheduler(SHEDULE_TIMER)
 
 server.listen( port, () => {
     console.log( `server started at http://localhost:${ port }` )

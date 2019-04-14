@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 const express_1 = __importDefault(require("express"));
 const http_1 = __importDefault(require("http"));
+const config_1 = require("./config/config");
 const utils_1 = require("./utils");
 const middleware_1 = __importDefault(require("./middleware"));
 const routes_1 = __importDefault(require("./middleware/routes"));
@@ -16,7 +17,7 @@ utils_1.applyMiddleware(middleware_1.default, router);
 utils_1.applyRoutes(routes_1.default, router);
 utils_1.connectDatabase();
 const server = http_1.default.createServer(router);
-utils_1.setEmailScheduler("32 * * * *");
+utils_1.setEmailScheduler(config_1.SHEDULE_TIMER);
 server.listen(port, () => {
     console.log(`server started at http://localhost:${port}`);
 });

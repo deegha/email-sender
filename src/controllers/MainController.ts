@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { errors } from '../config/config'
+import { errors } from "../config/config"
 
 export class MainController {
 

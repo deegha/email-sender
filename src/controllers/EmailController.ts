@@ -1,15 +1,15 @@
 import { Request, Response } from "express"
-import { MainController } from './MainController'
+import { MainController } from "./MainController"
 import { emailService } from "../services/EmailService"
 
 class EmailController extends MainController {
-  
-  sendEmail = async (req: Request, res: Response) => {
+
+  sendEmail = async (req: Request, res: Response): Promise<void> => {
     const { body } = req
 
-    if(!body.to || !body.content || !body.subject) {
+    if (!body.to || !body.content || !body.subject) {
       this.sendBadRequest(res)
-    }else {
+    } else {
       try {
         const response = await emailService.sendEmail(body)
         res.send(response)
@@ -19,27 +19,42 @@ class EmailController extends MainController {
     }
   }
 
-  checkEmailStatus =  async (req: Request, res: Response) => {
+  checkEmailStatus =  async (req: Request, res: Response): Promise<void> => {
     const { id }  = req.params
-    if(!id || id === null) {
+    if (!id || id === null) {
       this.sendBadRequest(res)
-    }else {
+    } else {
       try {
-        const status = await emailService.checkEmailStatus(id)
-        res.send({id,status})
+        const response = await emailService.checkEmailStatus(id)
+        res.send(response)
       } catch (err) {
         this.sendServerError(res)
       }
     }
   }
 
-  handleWebHook = async (req: Request, res: Response) => {
+  handleWebHook = async (req: Request, res: Response): Promise<void> => {
     console.log(req.body)
     try {
-      await emailService.updateEmailStatus(req.body)
+      emailService.updateEmailStatus(req.body)
       res.send({message: "success"})
-    }catch(err) {
+    } catch (err) {
       this.sendServerError(res)
+    }
+  }
+
+  deleteEmail = async (req: Request, res: Response): Promise<void> => {
+    const { id }  = req.params
+    if (!id || id === null) {
+      this.sendBadRequest(res)
+    } else {
+      try {
+        const response = await emailService.deleteEmailFromQueue(id)
+        res.send(response)
+      } catch (err) {
+        console.log(err)
+        this.sendServerError(res)
+      }
     }
   }
 }

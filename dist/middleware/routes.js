@@ -16,6 +16,11 @@ exports.default = [
         method: "post",
         path: "/v1/webhook",
         handler: EmailController_1.email.handleWebHook
+    },
+    {
+        method: "delete",
+        path: "/v1/emails/:id",
+        handler: EmailController_1.email.deleteEmail
     }
 ];
 //# sourceMappingURL=routes.js.map

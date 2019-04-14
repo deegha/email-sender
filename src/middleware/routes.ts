@@ -15,5 +15,10 @@ export default [
     method: "post",
     path: "/v1/webhook",
     handler: email.handleWebHook
+  },
+  {
+    method: "delete",
+    path: "/v1/emails/:id",
+    handler: email.deleteEmail
   }
 ]

@@ -13,3 +13,8 @@ export  interface EmailDatabseInterface extends mongoose.Document {
   subject: string,
   status: string
 }
+
+export interface Response {
+  id: string,
+  status: string
+}
