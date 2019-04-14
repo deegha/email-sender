@@ -1,5 +1,8 @@
 ## Email api
 
+### Overview
+This application sends emails to a given user or set of users. I have used a sendgrid webhook to update the status of the emails. And i have used node-schedule to run the queued emails.
+
 ### Prerequisites
 - node 
 - npm 
@@ -54,3 +57,6 @@
 #### Sheduling
 - Check `/src/config` to adjust the shedule timing and shedule range
 
+#### Unit test
+>stop the development server and 
+- on your teminal: run `npm run test` this will run the automated unit testing 
