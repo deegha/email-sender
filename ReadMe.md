@@ -7,7 +7,7 @@
   - https://ngrok.com/
 - sendgrid API key
 
-### Settingup application
+### Setting up application
 > Assuming you already have a sendgrid account and an api key
 
 #### setting up local environment
