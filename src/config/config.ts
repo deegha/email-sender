@@ -21,7 +21,7 @@ export const STATUS_DROPED = 400
  *  day of week (0 - 7)
  */
 
-export const SHEDULE_TIMER = "32 * * * *"
+export const SHEDULE_TIMER = "* * 8 * * *" // queued mails will send every day at 8AM
 
 export const TIME_FORMAT = "HH:mm:ss"
 
@@ -29,4 +29,4 @@ export const TIME_FORMAT = "HH:mm:ss"
  * Time the emails should start to queue
  */
 export const QUEUE_END = moment("08:00:00", TIME_FORMAT)
-export const QUEUE_START = moment("20:00:00", TIME_FORMAT)
+export const QUEUE_START = moment("17:00:00", TIME_FORMAT)

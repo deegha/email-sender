@@ -22,11 +22,11 @@ exports.STATUS_DROPED = 400;
  *  month (1 - 12)
  *  day of week (0 - 7)
  */
-exports.SHEDULE_TIMER = "32 * * * *";
+exports.SHEDULE_TIMER = "* * 8 * * *"; // queued mails will send every day at 8AM
 exports.TIME_FORMAT = "HH:mm:ss";
 /**
  * Time the emails should start to queue
  */
 exports.QUEUE_END = moment_1.default("08:00:00", exports.TIME_FORMAT);
-exports.QUEUE_START = moment_1.default("20:00:00", exports.TIME_FORMAT);
+exports.QUEUE_START = moment_1.default("17:00:00", exports.TIME_FORMAT);
 //# sourceMappingURL=config.js.map
